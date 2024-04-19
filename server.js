@@ -2,6 +2,7 @@ const express = require("express"); // Inkluderar express
 require("dotenv").config(); // Inkluderar env-fil
 const jwt = require("jsonwebtoken"); // Inkluderar JWT
 const authRoutes = require("./routes/authRoutes"); // Inkluderar routes
+const Experience = require('./models/Experience');  // Inkluderar modell för erfarenheter
 
 const app = express(); // Startar applikationen med express
 app.use(express.json()); // Inkluderar middleware till express för att konvertera data till json automatiskt
@@ -11,8 +12,24 @@ const port = process.env.PORT || 3000; // Lagrar variabel för port, startar ant
 app.use("/api", authRoutes);
 
 // Skapar en GET-route som är skyddad av JWT
-app.get("/api/protected", authenticateToken, (req, res) => {
-    res.json({ message: "Skyddad route" }); // Skickar ett svar som bekräftar att användaren har nått den skyddade routen
+app.get("/api/experiences", authenticateToken, async (req, res) => {
+    try {
+        // Hämtar alla alla jobberfarenheter från DB
+        const experiences = await Experience.find({});
+        // Kontrollerar om det inte finns några erfarenheter (tom)
+        if (experiences.length === 0) {
+            // Returnerar felmeddelande med felkod om inga resultat finns
+            return res.status(404).json({ message: "Inga jobberfarenheter funna" });
+        } else {
+            // Returnerar erfarenheter
+            return res.json(experiences);
+        }
+        // Fångar upp ev. felmeddelanden
+    } catch (error) {
+        console.error("Fel vid hämtning av erfarenheter: ", error);
+        // Returnerar statuskod tillsammans med felet
+        return res.status(500).json(error);
+    }
 });
 
 // Funktion för att validera JWT
