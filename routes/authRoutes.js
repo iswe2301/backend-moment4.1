@@ -11,5 +11,34 @@ mongoose.connect(process.env.DATABASE).then(() => {
     console.error("Fel vid anslutning till databasen...");
 });
 
+// Inkluderar användarmodell
+const User = require("../models/User");
+
+// Skapar en POST-route för att registrera en ny användare
+router.post("/register", async (req, res) => {
+    try {
+        // Hämtar användarnamn och lösenord från bodyn
+        const { username, password } = req.body;
+        // Kontrollerar om både användarnamn och lösenord har skickats
+        if (!username || !password) {
+            // Returnerar felmeddelande med felkod om något saknas
+            return res.status(400).json({ error: "Ogiltig input, skicka användarnamn och lösenord" })
+        }
+        // Kontrollerar om användaren redan existerar, söker i User-modellen
+        const existingUser = await User.findOne({ username: username });
+        if (existingUser) {
+            // Returnera felmeddelande med felkod om användaren redan finns
+            return res.status(409).json({ error: `Användare med användarnamn ${username} finns redan registrerad` });
+        }
+        // Skapar en ny användarinstans om input är korrekt och användarnamnet är unikt
+        const user = new User({ username, password });
+        // Sparar användaren i DB
+        await user.save();
+        res.status(201).json({ message: "Användare skapad" }); // Skickar success-meddelande om lyckad tilläggning
+    } catch (error) {
+        res.status(500).json({ error: "Server error" }); // Fångar upp ev. fel och skickar meddelande om det uppstår
+    }
+});
+
 // Exporterar router objektet så det kan användas av andra delar av applikationen
 module.exports = router;
