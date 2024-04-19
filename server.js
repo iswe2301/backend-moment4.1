@@ -1,6 +1,7 @@
 const express = require("express"); // Inkluderar express
 require("dotenv").config(); // Inkluderar env-fil
 const jwt = require("jsonwebtoken"); // Inkluderar JWT
+const cors = require('cors'); // Inkluderar cors
 const authRoutes = require("./routes/authRoutes"); // Inkluderar routes
 const Experience = require('./models/Experience');  // Inkluderar modell för erfarenheter
 
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000; // Lagrar variabel för port, startar ant
 
 // Använder exporterade routes
 app.use("/api", authRoutes);
+app.use(cors()); // Använder cors för att tillåta alla domäner
 
 // Skapar en GET-route som är skyddad av JWT
 app.get("/api/experiences", authenticateToken, async (req, res) => {
