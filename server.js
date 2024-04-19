@@ -9,9 +9,10 @@ const app = express(); // Startar applikationen med express
 app.use(express.json()); // Inkluderar middleware till express för att konvertera data till json automatiskt
 const port = process.env.PORT || 3000; // Lagrar variabel för port, startar antingen enligt inställningar i env-filen eller på port 3000
 
+app.use(cors()); // Använder cors för att tillåta alla domäner
+
 // Använder exporterade routes
 app.use("/api", authRoutes);
-app.use(cors()); // Använder cors för att tillåta alla domäner
 
 // Skapar en GET-route som är skyddad av JWT
 app.get("/api/experiences", authenticateToken, async (req, res) => {
