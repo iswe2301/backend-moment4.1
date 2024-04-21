@@ -23,13 +23,13 @@ router.post("/register", async (req, res) => {
         // Kontrollerar om både användarnamn och lösenord har skickats
         if (!username || !password) {
             // Returnerar felmeddelande med felkod om något saknas
-            return res.status(400).json({ error: "Ogiltig input, skicka användarnamn och lösenord" })
+            return res.status(400).json({ error: "Ogiltig input, ange användarnamn och lösenord" })
         }
         // Kontrollerar om användaren redan existerar, söker i User-modellen
         const existingUser = await User.findOne({ username: username });
         if (existingUser) {
             // Returnera felmeddelande med felkod om användaren redan finns
-            return res.status(409).json({ error: `Användare med användarnamn ${username} finns redan registrerad` });
+            return res.status(409).json({ error: "Användarnamnet är upptaget" });
         }
         // Skapar en ny användarinstans om input är korrekt och användarnamnet är unikt
         const user = new User({ username, password });
@@ -49,7 +49,7 @@ router.post("/login", async (req, res) => {
         // Kontrollerar om både användarnamn och lösen har skickats med
         if (!username || !password) {
             // Returnerar felmeddelande med felkod om något saknas
-            return res.status(400).json({ error: "Ogiltig input, skicka användarnamn och lösenord" })
+            return res.status(400).json({ error: "Ogiltig input, ange användarnamn och lösenord" })
         }
         // Kontrollerar om användaren existerar
         const user = await User.findOne({ username });
